@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!-- Created new Form View for wizard-->
+    <record id="ski_form_view_select_multi_product_wizard_purchase" model="ir.ui.view">
+        <field name="name">ski.form.view.select.multi.product.wizard.purchase</field>
+        <field name="model">ski.multi.product.purchase</field>
+        <field name="arch" type="xml">
+            <form string="Select Multiple Purchase Request">
+                <!-- <group> -->
+                    <field name="purchase_request_ids" nolabel="1" >
+                        <tree decoration-success="quantity_wait_order==0">
+                            <field name="approval_request_id"/>
+                            <field name="product_id" optional="hide"/>
+                            <field name="description"/>
+                            <field name="product_uom_id" string="UOM"/>
+                            <field name="quantity" string="QTY PR"/>
+                            <field name="quantity_to_order" force_save="1"/>
+                            <field name="quantity_on_order" force_save="1" readonly="1" optional="hide"/>
+                            <field name="quantity_wait_order" force_save="1" readonly="1" optional="hide"/>
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="approval_request_id" readonly="1" options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                                    <field name="product_id" readonly="1" options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                                    <field name="description" readonly="1"/>
+                                    <label for="quantity" string="Qty PR"/>
+                                    <div class="o_row g-0 d-flex">
+                                        <field name="quantity" class="oe_inline" readonly="1"/>
+                                        <label for="product_uom_id" string="" class="oe_inline"/>
+                                        <field name="product_uom_id" readonly="1" options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                                    </div>
+                                </group>
+                                <group>
+                                    <label for="quantity_on_order" string="Qty on Progress"/>
+                                    <div class="o_row g-0 d-flex">
+                                        <field name="quantity_on_order" class="oe_inline" force_save="1" readonly="1" invisible="0"/>
+                                        <label for="product_uom_id" string="" class="oe_inline"/>
+                                        <field name="product_uom_id" readonly="1" options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                                    </div>
+                                    <label for="quantity_wait_order" string="Qty Remaining"/>
+                                    <div class="o_row g-0 d-flex">
+                                        <field name="quantity_wait_order" class="oe_inline" force_save="1" readonly="1" invisible="0"/>
+                                        <label for="product_uom_id" string="" class="oe_inline"/>
+                                        <field name="product_uom_id" readonly="1" options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                                    </div>
+                                    <label for="quantity_to_order" string="Qty To Order"/>
+                                    <div class="o_row g-0 d-flex">
+                                        <field name="quantity_to_order" class="oe_inline" force_save="1"/>
+                                        <label for="product_uom_id" string="" class="oe_inline"/>
+                                        <field name="product_uom_id" readonly="1" options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                                    </div>
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+                <!-- </group> -->
+                <footer>
+                    <button class="btn-primary" name="add_product" type="object" string="Apply"/>
+                    Or
+                    <button string="Cancel" name="cancel_action" type="object"/>
+                    <!-- <button string="Cancel" class="oe_link" special="cancel"/> -->
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Created new action for wizard-->
+    <record id="action_select_multi_product_wizard_rfq" model="ir.actions.act_window">
+        <field name="name">Select Multiple PR</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">ski.multi.product.purchase</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="sr_purchase_order_form_inherit_add_multi_product_selection_button" model="ir.ui.view">
+        <field name="name">ski_purchase.order.form.inherit.add.multi.product.selection.button</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="%(action_select_multi_product_wizard_rfq)d" type="action" class="btn-primary" invisible="state != 'draft'" string="Select PR"/>
+            </header>
+            <xpath expr="//button[@name='button_cancel']" position="replace">
+                <button name="button_action_cancel" invisible="state not in ('draft', 'to approve', 'sent', 'purchase')" string="Cancel" type="object" data-hotkey="x"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
+                <field name="purchase_request_id" force_save="1"/>
+                <field name="purchase_request_lines" force_save="1" column_invisible="0" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="approval_request_form_inherit" model="ir.ui.view">
+        <field name="name">approval.request.form.inherit</field>
+        <field name="model">approval.product.line</field>
+        <field name="inherit_id" ref="approvals.approval_product_line_view_tree"/>
+        <field name="arch" type="xml">
+            <tree position="replace">
+                <tree decoration-success="quantity_wait_order==0">
+                    <field name="approval_request_id"/>
+                    <field name="product_id" optional="hide"/>
+                    <field name="description"/>
+                    <field name="product_uom_id" string="UOM"/>
+                    <field name="quantity" string="QTY"/>
+                    <field name="quantity_on_order" force_save="1" readonly="1" optional="hide"/>
+                    <field name="quantity_wait_order" force_save="1" readonly="1" optional="hide"/>
+                </tree>
+            </tree>
+        </field>
+    </record>
+</odoo>
