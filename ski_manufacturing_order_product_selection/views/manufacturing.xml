@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="mrp_order_form_inherit_view" model="ir.ui.view">
+        <field name="name">mrp.order.form.inherit.view</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="before">
+                <field name="sale_order_lines" force_save="1" string="Product By SO" options="{'no_create_edit': True, 'no_create': True, 'no_open': True}" domain="[('invisible_mrp','=',False),('is_downpayment','=',False),('is_service','=',False),('is_expense','=',False)]"/>
+                <field name="editable_product" force_save="1" readonly="1" invisible="1"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="replace">
+                <button name="button_action_confirm" invisible="state != 'draft'" string="Confirm" type="object" class="oe_highlight" data-hotkey="q"/>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="replace">
+                <field name="product_id" context="{'default_detailed_type': 'product'}" readonly="state != 'draft' or editable_product == False" default_focus="1" placeholder="Product to build..." options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
